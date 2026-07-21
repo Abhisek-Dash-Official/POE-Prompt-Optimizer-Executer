@@ -17,10 +17,19 @@ const userSchema = new mongoose.Schema(
                 "Please enter a valid email",
             ],
         },
-        password: {
+        hashedPassword: {
             type: String,
             required: [true, "Password is required"],
             select: false,
+        },
+        avatar_id: {
+            type: String,
+            default: "0",
+        },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user",
         },
         dailyTokensUsed: {
             type: Number,
