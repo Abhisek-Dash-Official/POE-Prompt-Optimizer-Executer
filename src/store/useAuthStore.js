@@ -2,15 +2,20 @@ import { create } from 'zustand';
 
 export const useAuthStore = create((set) => ({
     user: null,
+    usage: null,
     isAuthenticated: false,
-    isAuthenticated: true,
-    isCheckingAuth: false,
+    isCheckingAuth: true,
 
     setUser: (userData) => set({
         user: userData,
         isAuthenticated: true,
         isCheckingAuth: false
     }),
+
+    updateUsage: (newUsage) => set((state) => ({
+        ...state,
+        usage: { ...state.usage, ...newUsage }
+    })),
 
     logoutUser: () => set({
         user: null,
@@ -29,9 +34,14 @@ export const useAuthStore = create((set) => ({
                 const data = await res.json();
                 set({
                     user: {
-                        username: data.username,
-                        email: data.email,
-                        avatar_url: `/avatars/avatar-${data.avatar_id || 0}.png`
+                        username: data.user.username,
+                        email: data.user.email,
+                        avatar_url: `/avatars/avatar-${data.user.avatar_id || 0}.png`
+                    },
+                    usage: {
+                        used: data.usage.used,
+                        limit: data.usage.limit,
+                        remaining: data.usage.remaining,
                     },
                     isAuthenticated: true,
                     isCheckingAuth: false

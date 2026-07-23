@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import User from "@/models/User";
 import { getUserUid } from "@/lib/jwt";
+import { MAX_DAILY_TOKENS_LIMIT_PER_USER } from "@/config/server";
 
 export async function GET(req) {
     try {
@@ -24,12 +25,31 @@ export async function GET(req) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        const now = new Date();
+        const lastReset = new Date(user.lastTokenResetDate);
+        let currentTokensUsed = user.dailyTokensUsed;
+
+        if (now.toDateString() !== lastReset.toDateString()) {
+            await User.updateOne(
+                { _id: uid },
+                { $set: { dailyTokensUsed: 0, lastTokenResetDate: now } }
+            );
+            currentTokensUsed = 0;
+        }
+
+        const remainingTokens = Math.max(0, MAX_DAILY_TOKENS_LIMIT_PER_USER - currentTokensUsed);
+
         return NextResponse.json(
             {
                 user: {
                     username: user.username,
                     email: user.email,
                     avatar_id: user.avatar_id
+                },
+                usage: {
+                    used: currentTokensUsed,
+                    limit: MAX_DAILY_TOKENS_LIMIT_PER_USER,
+                    remaining: remainingTokens
                 }
             },
             { status: 200 }

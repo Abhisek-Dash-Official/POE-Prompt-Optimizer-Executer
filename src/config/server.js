@@ -1,0 +1,1 @@
+export const MAX_DAILY_TOKENS_LIMIT_PER_USER = 4000;

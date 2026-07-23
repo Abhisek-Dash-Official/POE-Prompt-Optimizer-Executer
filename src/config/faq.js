@@ -21,6 +21,6 @@ export const faqs = [
     },
     {
         question: "Are there any usage limits?",
-        answer: "To maintain zero-latency execution for all active connections, free-tier accounts are currently rate-limited to 50 optimizations per day. This prevents system abuse and ensures optimal bandwidth."
+        answer: "To maintain zero-latency execution and prevent API abuse, free-tier accounts operate on a strict Daily Token Limit. We track the number of AI tokens processed during both optimization and execution. You can monitor your real-time token usage directly in your workspace dashboard."
     }
 ];

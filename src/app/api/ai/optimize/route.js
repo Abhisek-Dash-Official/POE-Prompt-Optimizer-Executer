@@ -5,8 +5,7 @@ import User from "@/models/User";
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { buildOptimizerPrompt } from "@/lib/prompt-templates";
-
-const DAILY_PROMPT_LIMIT = 50;
+import { MAX_DAILY_TOKENS_LIMIT_PER_USER } from "@/config/server";
 
 export async function POST(req) {
     try {
@@ -29,14 +28,18 @@ export async function POST(req) {
         const now = new Date();
         const lastReset = new Date(user.lastTokenResetDate);
 
+        // Daily Reset Check
         if (now.toDateString() !== lastReset.toDateString()) {
+            await User.updateOne(
+                { _id: uid },
+                { $set: { dailyTokensUsed: 0, lastTokenResetDate: now } }
+            );
             user.dailyTokensUsed = 0;
-            user.lastTokenResetDate = now;
         }
 
-        if (user.dailyTokensUsed >= DAILY_PROMPT_LIMIT) {
+        if (user.dailyTokensUsed >= MAX_DAILY_TOKENS_LIMIT_PER_USER) {
             return NextResponse.json(
-                { error: "Daily limit reached. Please try again tomorrow." },
+                { error: "Daily token limit reached. Please try again tomorrow." },
                 { status: 429 }
             );
         }
@@ -50,23 +53,32 @@ export async function POST(req) {
 
         const masterPrompt = buildOptimizerPrompt({ task, role, tone, format, constraints, example });
 
-        const { text } = await generateText({
+        const { text, usage } = await generateText({
             model: google("gemini-1.5-flash"),
             prompt: masterPrompt,
             temperature: 0.7,
         });
 
-        user.dailyTokensUsed += 1;
-        await user.save();
+        const tokensUsed = usage?.totalTokens || 0;
+
+        if (tokensUsed > 0) {
+            await User.updateOne(
+                { _id: uid },
+                { $inc: { dailyTokensUsed: tokensUsed } }
+            );
+        }
+
+        const newTotalUsed = user.dailyTokensUsed + tokensUsed;
 
         return NextResponse.json(
             {
                 message: "Prompt optimized successfully.",
                 optimizedPrompt: text.trim(),
                 usage: {
-                    used: user.dailyTokensUsed,
-                    limit: DAILY_PROMPT_LIMIT,
-                    remaining: DAILY_PROMPT_LIMIT - user.dailyTokensUsed
+                    used: newTotalUsed,
+                    limit: MAX_DAILY_TOKENS_LIMIT_PER_USER,
+                    remaining: Math.max(0, MAX_DAILY_TOKENS_LIMIT_PER_USER - newTotalUsed),
+                    thisRequest: tokensUsed
                 }
             },
             { status: 200 }
