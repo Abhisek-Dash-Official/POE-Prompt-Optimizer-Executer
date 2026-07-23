@@ -3,7 +3,8 @@ import { create } from 'zustand';
 export const useAuthStore = create((set) => ({
     user: null,
     isAuthenticated: false,
-    isCheckingAuth: true,
+    isAuthenticated: true,
+    isCheckingAuth: false,
 
     setUser: (userData) => set({
         user: userData,
@@ -27,7 +28,11 @@ export const useAuthStore = create((set) => ({
             if (res.ok) {
                 const data = await res.json();
                 set({
-                    user: data.user,
+                    user: {
+                        username: data.username,
+                        email: data.email,
+                        avatar_url: `/avatars/avatar-${data.avatar_id || 0}.png`
+                    },
                     isAuthenticated: true,
                     isCheckingAuth: false
                 });
