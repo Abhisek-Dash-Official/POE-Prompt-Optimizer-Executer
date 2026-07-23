@@ -1,6 +1,7 @@
 export const siteConfig = {
     name: "POE",
-    description: "Dual-engine architecture for prompt optimization and real-time execution.",
+    logo: "/logo.png",
+    description: "Transform raw, unstructured thoughts into expert-level AI prompts and execute them instantly. Get optimal AI results with real-time streaming.",
     navLinks: [
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
@@ -12,4 +13,79 @@ export const siteConfig = {
         { name: "Contact", href: "/contact" },
         { name: "Terms & Privacy", href: "/legal" },
     ],
+};
+
+export const siteMetaData = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+    title: {
+        default: "POE — Prompt Optimizer & Executer",
+        template: "%s | POE",
+    },
+    description: siteConfig.description,
+    keywords: [
+        "Prompt Optimizer",
+        "Prompt Engineering",
+        "AI Prompt Generator",
+        "LLM Executor",
+        "Dual-Engine AI Architecture",
+        "Prompt Engineering Tool",
+        "AI Prompt Refiner",
+        "Master Prompt Generator",
+        "LLM Prompt Framework",
+        "Structured AI Instructions",
+        "Advanced Prompt Pipeline",
+        "Reduce AI Hallucinations",
+        "LLM Ambiguity Reduction",
+        "Parameterized Prompting",
+        "AI Context Engineering",
+        "Dynamic Prompt Formatting",
+        "Constraint-Based AI Output",
+        "Precision Prompt Engineering",
+        "Automated Prompt Tuning",
+        "Real-Time AI Streaming",
+        "Low-Latency LLM Execution",
+        "Instant AI Response Generation",
+        "High-Speed LPU Inference",
+        "Vercel AI SDK Integration",
+        "Lightning-Fast Token Generation",
+        "Professional AI Workflows",
+        "Enterprise Prompt Management",
+        "AI Content Structuring",
+        "Automated Task Execution",
+        "Developer Productivity Tools",
+        "Custom LLM System Instructions"
+    ],
+    authors: [{ name: "Abhisek Dash" }],
+    creator: "Abhisek Dash",
+    icons: {
+        icon: siteConfig.logo,
+        shortcut: siteConfig.logo,
+        apple: siteConfig.logo,
+    },
+    openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: process.env.NEXT_PUBLIC_APP_URL,
+        title: "POE — Prompt Optimizer & Executer",
+        description: siteConfig.description,
+        siteName: "POE",
+        images: [
+            {
+                url: "/readme-cover.png",
+                width: 1200,
+                height: 630,
+                alt: "POE — Prompt Optimizer & Executer Banner",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "POE — Prompt Optimizer & Executer",
+        description: siteConfig.description,
+        images: ["/readme-cover.png"],
+    },
+    robots: {
+        index: true,
+        follow: true,
+    },
 };
