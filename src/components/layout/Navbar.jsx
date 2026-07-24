@@ -73,7 +73,7 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <span className="text-sm text-blueprint-muted font-mono lowercase">
+                <span className="text-sm text-blueprint-muted font-mono">
                   {user?.username}
                 </span>
               </div>
@@ -153,7 +153,7 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <span className="text-lg text-blueprint-text font-mono lowercase">
+                <span className="text-lg text-blueprint-text font-mono">
                   {user?.username}
                 </span>
               </div>

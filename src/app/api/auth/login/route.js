@@ -19,7 +19,7 @@ export async function POST(req) {
             );
         }
 
-        const user = await User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email }).select("+hashedPassword");
         if (!user) {
             return NextResponse.json(
                 { error: "Invalid authentication credentials." },
@@ -27,7 +27,7 @@ export async function POST(req) {
             );
         }
 
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        const isPasswordMatch = await bcrypt.compare(password, user.hashedPassword);
         if (!isPasswordMatch) {
             return NextResponse.json(
                 { error: "Invalid authentication credentials." },
