@@ -24,6 +24,13 @@ export async function signToken(payload) {
         .sign(SECRET_KEY);
 }
 
+// Verify session token and return uid, role
+export async function verifySession(token) {
+    const payload = await decodeToken(token);
+    if (!payload) return null;
+    return { uid: payload.uid, role: payload.role };
+}
+
 // Just checks if the token belongs to an admin (Returns boolean)
 export async function checkIsAdmin(token) {
     const payload = await decodeToken(token);
