@@ -7,7 +7,7 @@ import OptimizerConsole from "@/components/workspace/OptimizerConsole";
 import SessionTerminal from "@/components/workspace/SessionTerminal";
 
 export default function WorkspacePage() {
-    const { user, usage, updateUsage } = useAuthStore();
+    const { user, usage, updateUsage, checkSession } = useAuthStore();
 
     // Optimizer Form State
     const [formData, setFormData] = useState({
@@ -89,20 +89,6 @@ export default function WorkspacePage() {
                 body: JSON.stringify({ prompt: optimizedPrompt }),
             });
 
-            const usedHeader = res.headers.get("X-Tokens-Used");
-            const limitHeader = res.headers.get("X-Tokens-Limit");
-            const remainingHeader = res.headers.get("X-Tokens-Remaining");
-
-            if (usedHeader && remainingHeader && usage) {
-                const newRemaining = parseInt(remainingHeader, 10);
-                const cost = Math.max(0, usage.remaining - newRemaining);
-
-                triggerTokenFlash(cost);
-                updateUsage({
-                    used: parseInt(usedHeader, 10), limit: parseInt(limitHeader, 10), remaining: newRemaining
-                });
-            }
-
             if (!res.ok) {
                 const errData = await res.json();
                 throw new Error(errData.error || "Execution failed.");
@@ -118,6 +104,8 @@ export default function WorkspacePage() {
                 const chunk = decoder.decode(value, { stream: true });
                 setFinalOutput((prev) => prev + chunk);
             }
+
+            checkSession();
 
         } catch (err) {
             setExecuteError(err.message);

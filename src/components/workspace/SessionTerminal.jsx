@@ -7,7 +7,9 @@ import {
   AlertTriangle,
   Copy,
   Check,
+  Edit3,
 } from "lucide-react";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 export default function SessionTerminal({
   optimizedPrompt,
@@ -21,14 +23,15 @@ export default function SessionTerminal({
   terminalEndRef,
 }) {
   const [isCopied, setIsCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    if (textareaRef.current) {
+    if (isEditing && textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  }, [optimizedPrompt]);
+  }, [isEditing, optimizedPrompt]);
 
   const handleCopy = async () => {
     if (!optimizedPrompt) return;
@@ -51,16 +54,25 @@ export default function SessionTerminal({
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-6 space-y-4 md:space-y-6">
+        {/* OPTIMIZED COMMAND SECTION */}
         <div
           className={`space-y-2 transition-opacity duration-300 ${optimizedPrompt ? "opacity-100" : "opacity-30"}`}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="text-[10px] md:text-xs text-blueprint-azure flex items-center gap-1 uppercase">
-              <ChevronRight className="w-3 h-3" /> Optimized_Command [EDITABLE]
+              <ChevronRight className="w-3 h-3" /> Optimized_Command{" "}
+              {isEditing ? "[EDITING]" : "[RENDERED_VIEW]"}
             </span>
 
             {optimizedPrompt && (
               <div className="flex flex-wrap gap-2 self-end sm:self-auto">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={`p-1.5 md:p-2 border transition-colors shrink-0 ${isEditing ? "border-blueprint-amber text-blueprint-amber bg-blueprint-amber/10" : "border-blueprint-line text-blueprint-muted hover:text-blueprint-text"}`}
+                  title={isEditing ? "Switch to Markdown View" : "Edit Prompt"}
+                >
+                  <Edit3 className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                </button>
                 <button
                   onClick={handleCopy}
                   className="p-1.5 md:p-2 border border-blueprint-line text-blueprint-muted hover:text-blueprint-text hover:border-blueprint-muted transition-colors shrink-0"
@@ -96,14 +108,27 @@ export default function SessionTerminal({
 
           <div className="relative group">
             <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-blueprint-line transition-colors group-focus-within:border-blueprint-amber" />
-            <textarea
-              ref={textareaRef}
-              value={optimizedPrompt}
-              onChange={(e) => setOptimizedPrompt(e.target.value)}
-              disabled={!optimizedPrompt || isExecuting}
-              className="w-full bg-blueprint-surface/50 border border-blueprint-line p-3 md:p-4 text-xs md:text-sm focus:outline-none focus:border-blueprint-amber resize-none overflow-y-auto custom-scrollbar text-blueprint-text transition-colors disabled:opacity-70 font-sans min-h-25 md:min-h-60 max-h-[70vh]"
-              placeholder="Awaiting optimization sequence..."
-            />
+
+            {isEditing ? (
+              <textarea
+                ref={textareaRef}
+                value={optimizedPrompt}
+                onChange={(e) => setOptimizedPrompt(e.target.value)}
+                disabled={isExecuting}
+                className="w-full bg-blueprint-surface/50 border border-blueprint-line p-3 md:p-4 text-xs md:text-sm focus:outline-none focus:border-blueprint-amber resize-none overflow-y-auto custom-scrollbar text-blueprint-text transition-colors disabled:opacity-70 font-sans min-h-25 md:min-h-60 max-h-[60vh]"
+                placeholder="Awaiting optimization sequence..."
+              />
+            ) : (
+              <div className="w-full bg-blueprint-surface/50 border border-blueprint-line p-3 md:p-4 text-xs md:text-sm text-blueprint-text font-sans min-h-25 md:min-h-60 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                {optimizedPrompt ? (
+                  <MarkdownRenderer content={optimizedPrompt} />
+                ) : (
+                  <span className="text-blueprint-muted italic">
+                    Awaiting optimization sequence...
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -114,17 +139,24 @@ export default function SessionTerminal({
           </div>
         )}
 
+        {/* EXECUTION OUTPUT SECTION */}
         {(finalOutput || isExecuting) && (
-          <div
-            className="pt-4 border-t border-blueprint-line font-sans text-sm md:text-[15px] leading-relaxed text-blueprint-text whitespace-pre-wrap wrap-break-word relative"
-            aria-live={isExecuting ? "polite" : "off"}
-            aria-busy={isExecuting}
-          >
-            {finalOutput}
-            {isExecuting && (
-              <span className="inline-block w-2 md:w-2.5 h-3.5 md:h-4 ml-1 bg-blueprint-azure animate-pulse align-middle" />
-            )}
-            <div ref={terminalEndRef} className="h-1 shrink-0 w-full" />
+          <div className="pt-4 border-t border-blueprint-line space-y-3">
+            <div className="flex items-center gap-1 text-[10px] md:text-xs text-blueprint-amber uppercase tracking-wider">
+              <ChevronRight className="w-3 h-3" /> Execution_Output [RESULT]
+            </div>
+
+            <div
+              className="font-sans text-sm md:text-[15px] leading-relaxed text-blueprint-text wrap-break-word relative max-w-none"
+              aria-live={isExecuting ? "polite" : "off"}
+              aria-busy={isExecuting}
+            >
+              <MarkdownRenderer content={finalOutput} />
+              {isExecuting && (
+                <span className="inline-block w-2 md:w-2.5 h-3.5 md:h-4 ml-1 bg-blueprint-azure animate-pulse align-middle" />
+              )}
+              <div ref={terminalEndRef} className="h-1 shrink-0 w-full" />
+            </div>
           </div>
         )}
       </div>
