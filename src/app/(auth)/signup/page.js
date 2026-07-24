@@ -58,33 +58,33 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen bg-blueprint-base flex items-center justify-center relative py-12 px-6">
-            {/* Background */}
+        <div className="min-h-screen bg-blueprint-base flex items-center justify-center relative py-12 px-4 sm:px-6">
+            {/* Background grid */}
             <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#24334D_1px,transparent_1px),linear-gradient(to_bottom,#24334D_1px,transparent_1px)] bg-size-[64px_64px] z-0"></div>
 
-            <div className="relative z-10 w-full max-w-xl bg-blueprint-surface/80 border border-blueprint-line p-8 corner-brackets backdrop-blur-sm">
+            <div className="relative z-10 w-full max-w-xl bg-blueprint-surface/80 border border-blueprint-line p-6 sm:p-8 corner-brackets backdrop-blur-sm">
 
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                     <span className="inline-flex items-center gap-2 px-2 py-1 bg-blueprint-azure/10 border border-blueprint-azure/30 font-mono text-xs text-blueprint-azure uppercase tracking-wider mb-4">
                         <Terminal className="w-3.5 h-3.5" />
                         New_Identity
                     </span>
-                    <h1 className="text-3xl font-bold text-blueprint-text">Register Account</h1>
-                    <p className="text-blueprint-muted text-sm mt-2 font-mono">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-blueprint-text">Register Account</h1>
+                    <p className="text-blueprint-muted text-xs sm:text-sm mt-2 font-mono">
                         Create a new account for system access.
                     </p>
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-3 bg-blueprint-error/10 border border-blueprint-error/50 flex items-start gap-3 text-blueprint-error text-sm">
+                    <div className="mb-6 p-3 bg-blueprint-error/10 border border-blueprint-error/50 flex items-start gap-3 text-blueprint-error text-xs sm:text-sm">
                         <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
                         <p>{error}</p>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                         <div className="space-y-1.5">
                             <label className="text-xs font-mono text-blueprint-muted uppercase tracking-wider">Username</label>
                             <input
@@ -133,15 +133,21 @@ export default function SignupPage() {
                             <span className="text-blueprint-azure">ID: {formData.avatar_id}</span>
                         </label>
 
-                        <div className="grid grid-cols-7 gap-2 max-h-48 overflow-y-auto p-2 bg-blueprint-base border border-blueprint-line custom-scrollbar">
+                        <div
+                            className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-56 overflow-y-auto p-3 bg-blueprint-base border border-blueprint-line"
+                            style={{
+                                scrollbarWidth: 'thin',
+                                scrollbarColor: '#24334D #0B1220'
+                            }}
+                        >
                             {avatars.map((id) => (
                                 <button
                                     key={id}
                                     type="button"
                                     onClick={() => handleAvatarSelect(id)}
-                                    className={`relative aspect-square rounded-sm overflow-hidden border-2 transition-all ${formData.avatar_id === id
-                                        ? "border-blueprint-azure scale-105 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                        : "border-transparent hover:border-blueprint-line opacity-70 hover:opacity-100"
+                                    className={`relative aspect-square rounded-md overflow-hidden border-2 transition-all ${formData.avatar_id === id
+                                        ? "border-blueprint-azure scale-105 shadow-[0_0_12px_rgba(59,130,246,0.6)] z-10"
+                                        : "border-blueprint-line/40 hover:border-blueprint-azure/50 opacity-80 hover:opacity-100"
                                         }`}
                                 >
                                     <Image
@@ -149,11 +155,11 @@ export default function SignupPage() {
                                         alt={`Avatar ${id}`}
                                         fill
                                         className="object-cover"
-                                        sizes="48px"
+                                        sizes="(max-width: 640px) 25vw, 15vw"
                                     />
                                     {formData.avatar_id === id && (
-                                        <div className="absolute inset-0 bg-blueprint-azure/20 flex items-center justify-center">
-                                            <Check className="w-4 h-4 text-white drop-shadow-md" />
+                                        <div className="absolute inset-0 bg-blueprint-azure/30 flex items-center justify-center">
+                                            <Check className="w-5 h-5 text-white drop-shadow-md" />
                                         </div>
                                     )}
                                 </button>
@@ -172,7 +178,7 @@ export default function SignupPage() {
                 </form>
 
                 <div className="mt-6 text-center border-t border-blueprint-line pt-6">
-                    <p className="text-blueprint-muted text-sm font-mono">
+                    <p className="text-blueprint-muted text-xs sm:text-sm font-mono">
                         Already have an account?{" "}
                         <Link href="/login" className="text-blueprint-azure hover:underline">
                             Login
