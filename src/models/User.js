@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
         },
         dailyTokensUsed: {
             type: Number,
-            default: 4000,
+            default: 0,
         },
         lastTokenResetDate: {
             type: Date,

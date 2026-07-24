@@ -1,4 +1,4 @@
-import { streamText, createTextStreamResponse } from 'ai';
+import { streamText } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { NextResponse } from 'next/server';
 import { getUserUid } from "@/lib/jwt";
@@ -53,24 +53,11 @@ export async function POST(req) {
         }
 
         const remainingTokens = Math.max(0, MAX_DAILY_TOKENS_LIMIT_PER_USER - user.dailyTokensUsed);
-        const headers = {
-            'X-Tokens-Used': user.dailyTokensUsed.toString(),
-            'X-Tokens-Limit': MAX_DAILY_TOKENS_LIMIT_PER_USER.toString(),
-            'X-Tokens-Remaining': remainingTokens.toString(),
-        };
 
         const result = streamText({
-            model: groq('llama3-8b-8192'),
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert AI assistant. Strictly follow the instructions, formatting, and constraints provided in the user prompt to give the final output.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
+            model: groq('llama-3.1-8b-instant'),
+            system: 'You are an expert AI assistant. Strictly follow the instructions, formatting, and constraints provided in the user prompt to give the final output.',
+            prompt: prompt,
             temperature: 0.5,
 
             async onFinish({ usage }) {
@@ -88,7 +75,28 @@ export async function POST(req) {
             }
         });
 
-        return createTextStreamResponse(result.stream, { headers });
+        const encoder = new TextEncoder();
+        const readableStream = new ReadableStream({
+            async start(controller) {
+                try {
+                    for await (const textPart of result.textStream) {
+                        controller.enqueue(encoder.encode(textPart));
+                    }
+                    controller.close();
+                } catch (err) {
+                    controller.error(err);
+                }
+            }
+        });
+
+        return new Response(readableStream, {
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'X-Tokens-Used': user.dailyTokensUsed.toString(),
+                'X-Tokens-Limit': MAX_DAILY_TOKENS_LIMIT_PER_USER.toString(),
+                'X-Tokens-Remaining': remainingTokens.toString(),
+            },
+        });
 
     } catch (error) {
         console.error("API Error [POST /api/ai/execute]:", error);

@@ -9,7 +9,7 @@ export const faqs = [
     },
     {
         question: "What engines power the optimization and execution layers?",
-        answer: "The Optimization Layer uses Google Gemini 1.5 Flash for advanced context reasoning and prompt engineering. The compiled prompt is then sent to the Execution Layer, which utilizes Groq's LPU hardware (running Llama-3) for ultra-low latency, real-time streaming."
+        answer: "The Optimization Layer uses Google Gemini 3.6 Flash for advanced context reasoning and prompt engineering. The compiled prompt is then sent to the Execution Layer, which utilizes Groq's LPU hardware (running Llama-3) for ultra-low latency, real-time streaming."
     },
     {
         question: "Is my data stored or used for training?",

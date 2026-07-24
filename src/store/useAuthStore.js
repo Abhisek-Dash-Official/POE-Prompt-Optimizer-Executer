@@ -19,6 +19,7 @@ export const useAuthStore = create((set) => ({
 
     logoutUser: () => set({
         user: null,
+        usage: null,
         isAuthenticated: false,
         isCheckingAuth: false
     }),
@@ -49,6 +50,7 @@ export const useAuthStore = create((set) => ({
             } else {
                 set({
                     user: null,
+                    usage: null,
                     isAuthenticated: false,
                     isCheckingAuth: false
                 });
@@ -57,6 +59,7 @@ export const useAuthStore = create((set) => ({
             console.error("Session check failed:", error);
             set({
                 user: null,
+                usage: null,
                 isAuthenticated: false,
                 isCheckingAuth: false
             });
